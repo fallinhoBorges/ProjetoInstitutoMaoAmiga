@@ -16,7 +16,7 @@ const produtos: Produto[] = [
 export default function App() {
   return (
     <View style={styles.container}>
-      <Text>Bem-vindo!!</Text>
+      <Text>Hello World!!</Text>
       <StatusBar style="auto" />
     </View>
   );
