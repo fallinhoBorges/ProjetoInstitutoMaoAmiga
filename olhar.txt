@@ -1,0 +1,3 @@
+Gerenciador de Estados
+
+- Fazer alterações e implementações no App.tsx. Criar produtos e uma function ListaProdutos e outra ItemProduto.
