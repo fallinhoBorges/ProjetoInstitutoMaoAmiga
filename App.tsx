@@ -1,32 +1,28 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import TelaListaPontos from './TelaListaPontos';
+import TelaDetalhePonto from './TelaDetalhePonto';
+import { RootStackParamList } from './navigation';
 
-type Produto = (
-  id: string,
-  nome: string,
-  preco: number,
-  imagem: string
-)
-
-const produtos: Produto[] = [
-  (id: 1, nome: 'Produto1', preco: 25.50, imagem: 'wwwwww'),
-  (id: 2, nome: 'Produto2', preco: 40.00, imagem: 'wwwweee'),
-];
+const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export default function App() {
   return (
-    <View style={styles.container}>
-      <Text>Hello World!!</Text>
+    <NavigationContainer>
+      <Stack.Navigator initialRouteName="ListaPontos">
+        <Stack.Screen
+          name="ListaPontos"
+          component={TelaListaPontos}
+          options={{ title: 'Pontos de Coleta' }}
+        />
+        <Stack.Screen
+          name="DetalhePonto"
+          component={TelaDetalhePonto}
+          options={{ title: 'Detalhe do Ponto' }}
+        />
+      </Stack.Navigator>
       <StatusBar style="auto" />
-    </View>
+    </NavigationContainer>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
