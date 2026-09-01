@@ -1,23 +1,84 @@
-import { useMemo, useState } from 'react';
-import { FlatList, SafeAreaView, StyleSheet, TextInput } from 'react-native';
+import { useMemo, useRef, useState } from 'react';
+import {
+  FlatList,
+  Keyboard,
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+} from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { pontosMock } from './pontos';
+import { Ponto } from './pontos';
 import PontoItem from './PontoItem';
 import { RootStackParamList } from './navigation';
 
-type Props = NativeStackScreenProps<RootStackParamList, 'ListaPontos'>;
+type Props = NativeStackScreenProps<RootStackParamList, 'ListaPontos'> & {
+  pontos: Ponto[];
+  onAdicionarPonto: (ponto: Ponto) => void;
+};
 
-export default function TelaListaPontos({ navigation }: Props) {
+export default function TelaListaPontos({ navigation, pontos, onAdicionarPonto }: Props) {
   const [busca, setBusca] = useState('');
 
   const pontosFiltrados = useMemo(() => {
-    return pontosMock.filter((ponto) =>
+    return pontos.filter((ponto) =>
       ponto.nome.toLowerCase().includes(busca.toLowerCase())
     );
-  }, [busca]);
+  }, [pontos, busca]);
+
+  const [nome, setNome] = useState('');
+  const [endereco, setEndereco] = useState('');
+  const [erro, setErro] = useState('');
+  const inputEnderecoRef = useRef<TextInput>(null);
+
+  function validarESalvar() {
+    if (nome.trim() === '') {
+      setErro('O nome do ponto não pode ficar vazio.');
+      return;
+    }
+    if (endereco.trim() === '') {
+      setErro('O endereço não pode ficar vazio.');
+      return;
+    }
+    onAdicionarPonto({
+      id: Date.now().toString(),
+      nome: nome.trim(),
+      endereco: endereco.trim(),
+      diasHorarios: 'A definir',
+      recebeDistribui: 'A definir',
+    });
+    setNome('');
+    setEndereco('');
+    setErro('');
+    Keyboard.dismiss();
+  }
 
   return (
     <SafeAreaView style={styles.container}>
+      <Text style={styles.tituloCadastro}>Cadastrar novo ponto</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Nome do ponto"
+        value={nome}
+        onChangeText={setNome}
+        returnKeyType="next"
+        onSubmitEditing={() => inputEnderecoRef.current?.focus()}
+      />
+      <TextInput
+        ref={inputEnderecoRef}
+        style={styles.input}
+        placeholder="Endereço"
+        value={endereco}
+        onChangeText={setEndereco}
+        returnKeyType="done"
+        onSubmitEditing={validarESalvar}
+      />
+      {erro !== '' && <Text style={styles.erro}>{erro}</Text>}
+      <TouchableOpacity style={styles.botao} onPress={validarESalvar}>
+        <Text style={styles.botaoTexto}>Cadastrar ponto</Text>
+      </TouchableOpacity>
+
       <TextInput
         style={styles.busca}
         placeholder="Buscar pontos..."
@@ -26,6 +87,7 @@ export default function TelaListaPontos({ navigation }: Props) {
       />
 
       <FlatList
+        style={styles.lista}
         data={pontosFiltrados}
         keyExtractor={(ponto) => ponto.id}
         renderItem={({ item }) => (
@@ -53,6 +115,38 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     paddingHorizontal: 12,
     paddingVertical: 8,
-    marginBottom: 16,
+    marginTop: 16,
+  },
+  lista: {
+    flex: 1,
+    marginTop: 16,
+  },
+  tituloCadastro: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#1B3A5C',
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    marginTop: 8,
+  },
+  erro: {
+    color: '#C62828',
+    marginTop: 8,
+  },
+  botao: {
+    backgroundColor: '#1B3A5C',
+    borderRadius: 8,
+    paddingVertical: 12,
+    alignItems: 'center',
+    marginTop: 8,
+  },
+  botaoTexto: {
+    color: '#FFFFFF',
+    fontWeight: 'bold',
   },
 });

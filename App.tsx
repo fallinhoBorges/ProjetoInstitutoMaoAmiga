@@ -1,26 +1,32 @@
 import { StatusBar } from 'expo-status-bar';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { useState } from 'react';
 import TelaListaPontos from './TelaListaPontos';
 import TelaDetalhePonto from './TelaDetalhePonto';
 import { RootStackParamList } from './navigation';
+import { Ponto, pontosIniciais } from './pontos';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export default function App() {
+  const [pontos, setPontos] = useState<Ponto[]>(pontosIniciais);
+
+  function adicionarPonto(novoPonto: Ponto) {
+    setPontos((atual) => [...atual, novoPonto]);
+  }
+
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName="ListaPontos">
-        <Stack.Screen
-          name="ListaPontos"
-          component={TelaListaPontos}
-          options={{ title: 'Pontos de Coleta' }}
-        />
-        <Stack.Screen
-          name="DetalhePonto"
-          component={TelaDetalhePonto}
-          options={{ title: 'Detalhe do Ponto' }}
-        />
+        <Stack.Screen name="ListaPontos" options={{ title: 'Pontos de Coleta' }}>
+          {(props) => (
+            <TelaListaPontos {...props} pontos={pontos} onAdicionarPonto={adicionarPonto} />
+          )}
+        </Stack.Screen>
+        <Stack.Screen name="DetalhePonto" options={{ title: 'Detalhe do Ponto' }}>
+          {(props) => <TelaDetalhePonto {...props} pontos={pontos} />}
+        </Stack.Screen>
       </Stack.Navigator>
       <StatusBar style="auto" />
     </NavigationContainer>

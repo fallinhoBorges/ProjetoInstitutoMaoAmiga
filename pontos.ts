@@ -6,7 +6,7 @@ export type Ponto = {
   recebeDistribui: string;
 };
 
-export const pontosMock: Ponto[] = [
+export const pontosIniciais: Ponto[] = [
   {
     id: '1',
     nome: 'Ponto Vila Esperança',

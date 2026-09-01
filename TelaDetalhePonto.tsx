@@ -1,13 +1,15 @@
 import { SafeAreaView, StyleSheet, Text } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { pontosMock } from './pontos';
+import { Ponto } from './pontos';
 import { RootStackParamList } from './navigation';
 
-type Props = NativeStackScreenProps<RootStackParamList, 'DetalhePonto'>;
+type Props = NativeStackScreenProps<RootStackParamList, 'DetalhePonto'> & {
+  pontos: Ponto[];
+};
 
-export default function TelaDetalhePonto({ route }: Props) {
+export default function TelaDetalhePonto({ route, pontos }: Props) {
   const { pontoId } = route.params;
-  const ponto = pontosMock.find((item) => item.id === pontoId);
+  const ponto = pontos.find((item) => item.id === pontoId);
 
   if (!ponto) {
     return (
