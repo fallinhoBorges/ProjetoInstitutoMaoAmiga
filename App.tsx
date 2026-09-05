@@ -4,6 +4,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useState } from 'react';
 import TelaListaPontos from './TelaListaPontos';
 import TelaDetalhePonto from './TelaDetalhePonto';
+import TelaCadastroDoacao from './TelaCadastroDoacao';
 import { RootStackParamList } from './navigation';
 import { Ponto, pontosIniciais } from './pontos';
 
@@ -26,6 +27,9 @@ export default function App() {
         </Stack.Screen>
         <Stack.Screen name="DetalhePonto" options={{ title: 'Detalhe do Ponto' }}>
           {(props) => <TelaDetalhePonto {...props} pontos={pontos} />}
+        </Stack.Screen>
+        <Stack.Screen name="CadastroDoacao" options={{ title: 'Registrar Doação' }}>
+          {(props) => <TelaCadastroDoacao {...props} pontos={pontos} />}
         </Stack.Screen>
       </Stack.Navigator>
       <StatusBar style="auto" />

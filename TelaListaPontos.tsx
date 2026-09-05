@@ -79,6 +79,13 @@ export default function TelaListaPontos({ navigation, pontos, onAdicionarPonto }
         <Text style={styles.botaoTexto}>Cadastrar ponto</Text>
       </TouchableOpacity>
 
+      <TouchableOpacity
+        style={styles.botaoSecundario}
+        onPress={() => navigation.navigate('CadastroDoacao')}
+      >
+        <Text style={styles.botaoSecundarioTexto}>Registrar doação</Text>
+      </TouchableOpacity>
+
       <TextInput
         style={styles.busca}
         placeholder="Buscar pontos..."
@@ -147,6 +154,18 @@ const styles = StyleSheet.create({
   },
   botaoTexto: {
     color: '#FFFFFF',
+    fontWeight: 'bold',
+  },
+  botaoSecundario: {
+    borderWidth: 1,
+    borderColor: '#1B3A5C',
+    borderRadius: 8,
+    paddingVertical: 12,
+    alignItems: 'center',
+    marginTop: 8,
+  },
+  botaoSecundarioTexto: {
+    color: '#1B3A5C',
     fontWeight: 'bold',
   },
 });
