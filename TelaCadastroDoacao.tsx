@@ -1,13 +1,15 @@
 import { useState } from 'react';
 import {
   Keyboard,
-  SafeAreaView,
+  KeyboardAvoidingView,
+  Platform,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   View,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { Ponto } from './pontos';
 import { RootStackParamList } from './navigation';
@@ -53,7 +55,11 @@ export default function TelaCadastroDoacao({ pontos }: Props) {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['bottom', 'left', 'right']}>
+      <KeyboardAvoidingView
+        style={styles.container}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      >
       <Text style={styles.titulo}>Registrar doação</Text>
 
       <Text style={styles.rotulo}>Tipo do item</Text>
@@ -112,6 +118,7 @@ export default function TelaCadastroDoacao({ pontos }: Props) {
       <TouchableOpacity style={styles.botao} onPress={validar}>
         <Text style={styles.botaoTexto}>Registrar doação</Text>
       </TouchableOpacity>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
@@ -150,8 +157,9 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#E0E0E0',
     borderRadius: 20,
+    minHeight: 44,
+    justifyContent: 'center',
     paddingHorizontal: 14,
-    paddingVertical: 8,
   },
   chipPontoSelecionado: {
     backgroundColor: '#1B3A5C',
@@ -174,7 +182,8 @@ const styles = StyleSheet.create({
   botao: {
     backgroundColor: '#1B3A5C',
     borderRadius: 8,
-    paddingVertical: 12,
+    minHeight: 44,
+    justifyContent: 'center',
     alignItems: 'center',
     marginTop: 16,
   },

@@ -2,12 +2,14 @@ import { useMemo, useRef, useState } from 'react';
 import {
   FlatList,
   Keyboard,
-  SafeAreaView,
+  KeyboardAvoidingView,
+  Platform,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { Ponto } from './pontos';
 import PontoItem from './PontoItem';
@@ -55,57 +57,62 @@ export default function TelaListaPontos({ navigation, pontos, onAdicionarPonto }
   }
 
   return (
-    <SafeAreaView style={styles.container}>
-      <Text style={styles.tituloCadastro}>Cadastrar novo ponto</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Nome do ponto"
-        value={nome}
-        onChangeText={setNome}
-        returnKeyType="next"
-        onSubmitEditing={() => inputEnderecoRef.current?.focus()}
-      />
-      <TextInput
-        ref={inputEnderecoRef}
-        style={styles.input}
-        placeholder="Endereço"
-        value={endereco}
-        onChangeText={setEndereco}
-        returnKeyType="done"
-        onSubmitEditing={validarESalvar}
-      />
-      {erro !== '' && <Text style={styles.erro}>{erro}</Text>}
-      <TouchableOpacity style={styles.botao} onPress={validarESalvar}>
-        <Text style={styles.botaoTexto}>Cadastrar ponto</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity
-        style={styles.botaoSecundario}
-        onPress={() => navigation.navigate('CadastroDoacao')}
+    <SafeAreaView style={styles.container} edges={['bottom', 'left', 'right']}>
+      <KeyboardAvoidingView
+        style={styles.container}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
-        <Text style={styles.botaoSecundarioTexto}>Registrar doação</Text>
-      </TouchableOpacity>
+        <Text style={styles.tituloCadastro}>Cadastrar novo ponto</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Nome do ponto"
+          value={nome}
+          onChangeText={setNome}
+          returnKeyType="next"
+          onSubmitEditing={() => inputEnderecoRef.current?.focus()}
+        />
+        <TextInput
+          ref={inputEnderecoRef}
+          style={styles.input}
+          placeholder="Endereço"
+          value={endereco}
+          onChangeText={setEndereco}
+          returnKeyType="done"
+          onSubmitEditing={validarESalvar}
+        />
+        {erro !== '' && <Text style={styles.erro}>{erro}</Text>}
+        <TouchableOpacity style={styles.botao} onPress={validarESalvar}>
+          <Text style={styles.botaoTexto}>Cadastrar ponto</Text>
+        </TouchableOpacity>
 
-      <TextInput
-        style={styles.busca}
-        placeholder="Buscar pontos..."
-        value={busca}
-        onChangeText={setBusca}
-      />
+        <TouchableOpacity
+          style={styles.botaoSecundario}
+          onPress={() => navigation.navigate('CadastroDoacao')}
+        >
+          <Text style={styles.botaoSecundarioTexto}>Registrar doação</Text>
+        </TouchableOpacity>
 
-      <FlatList
-        style={styles.lista}
-        data={pontosFiltrados}
-        keyExtractor={(ponto) => ponto.id}
-        renderItem={({ item }) => (
-          <PontoItem
-            ponto={item}
-            onPress={() =>
-              navigation.navigate('DetalhePonto', { pontoId: item.id })
-            }
-          />
-        )}
-      />
+        <TextInput
+          style={styles.busca}
+          placeholder="Buscar pontos..."
+          value={busca}
+          onChangeText={setBusca}
+        />
+
+        <FlatList
+          style={styles.lista}
+          data={pontosFiltrados}
+          keyExtractor={(ponto) => ponto.id}
+          renderItem={({ item }) => (
+            <PontoItem
+              ponto={item}
+              onPress={() =>
+                navigation.navigate('DetalhePonto', { pontoId: item.id })
+              }
+            />
+          )}
+        />
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
@@ -148,7 +155,8 @@ const styles = StyleSheet.create({
   botao: {
     backgroundColor: '#1B3A5C',
     borderRadius: 8,
-    paddingVertical: 12,
+    minHeight: 44,
+    justifyContent: 'center',
     alignItems: 'center',
     marginTop: 8,
   },
@@ -160,7 +168,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#1B3A5C',
     borderRadius: 8,
-    paddingVertical: 12,
+    minHeight: 44,
+    justifyContent: 'center',
     alignItems: 'center',
     marginTop: 8,
   },
