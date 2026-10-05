@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import {
   Keyboard,
   KeyboardAvoidingView,
@@ -11,20 +11,12 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { salvarDoacao } from './doacoesStorage';
 import { Ponto } from './pontos';
 import { RootStackParamList } from './navigation';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'CadastroDoacao'> & {
   pontos: Ponto[];
-};
-
-const CHAVE_ULTIMA_DOACAO = '@instituto_mao_amiga:ultima_doacao';
-
-type DoacaoSalva = {
-  tipoItem: string;
-  quantidade: string;
-  pontoDestinoId: string | null;
 };
 
 export default function TelaCadastroDoacao({ pontos }: Props) {
@@ -33,18 +25,6 @@ export default function TelaCadastroDoacao({ pontos }: Props) {
   const [pontoDestinoId, setPontoDestinoId] = useState<string | null>(null);
   const [erro, setErro] = useState('');
   const [sucesso, setSucesso] = useState(false);
-
-  useEffect(() => {
-    async function carregarUltimaDoacao() {
-      const salvo = await AsyncStorage.getItem(CHAVE_ULTIMA_DOACAO);
-      if (!salvo) return;
-      const doacao: DoacaoSalva = JSON.parse(salvo);
-      setTipoItem(doacao.tipoItem);
-      setQuantidade(doacao.quantidade);
-      setPontoDestinoId(doacao.pontoDestinoId);
-    }
-    carregarUltimaDoacao();
-  }, []);
 
   function handleQuantidadeChange(texto: string) {
     if (texto === '' || /^\d+$/.test(texto)) {
@@ -70,8 +50,15 @@ export default function TelaCadastroDoacao({ pontos }: Props) {
       setErro('Selecione um ponto de destino.');
       return;
     }
-    const doacao: DoacaoSalva = { tipoItem, quantidade, pontoDestinoId };
-    await AsyncStorage.setItem(CHAVE_ULTIMA_DOACAO, JSON.stringify(doacao));
+    const pontoDestino = pontos.find((ponto) => ponto.id === pontoDestinoId)?.nome ?? '';
+    await salvarDoacao({
+      tipoItem: tipoItem.trim(),
+      quantidade: Number(quantidade.trim()),
+      pontoDestino,
+    });
+    setTipoItem('');
+    setQuantidade('');
+    setPontoDestinoId(null);
     setErro('');
     setSucesso(true);
     Keyboard.dismiss();
