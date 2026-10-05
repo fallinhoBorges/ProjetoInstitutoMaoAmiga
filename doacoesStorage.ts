@@ -40,3 +40,8 @@ export async function salvarDoacao(nova: NovaDoacao): Promise<Doacao> {
   await gravarDoacoes([...doacoes, doacao]);
   return doacao;
 }
+
+export async function excluirDoacao(id: string): Promise<void> {
+  const doacoes = await listarDoacoes();
+  await gravarDoacoes(doacoes.filter((doacao) => doacao.id !== id));
+}

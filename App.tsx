@@ -6,6 +6,7 @@ import TelaListaPontos from './TelaListaPontos';
 import TelaDetalhePonto from './TelaDetalhePonto';
 import TelaCadastroDoacao from './TelaCadastroDoacao';
 import TelaHistoricoDoacoes from './TelaHistoricoDoacoes';
+import TelaDetalheDoacao from './TelaDetalheDoacao';
 import { RootStackParamList } from './navigation';
 import { Ponto, pontosIniciais } from './pontos';
 
@@ -36,6 +37,11 @@ export default function App() {
           name="HistoricoDoacoes"
           component={TelaHistoricoDoacoes}
           options={{ title: 'Minhas doações' }}
+        />
+        <Stack.Screen
+          name="DetalheDoacao"
+          component={TelaDetalheDoacao}
+          options={{ title: 'Detalhe da Doação' }}
         />
       </Stack.Navigator>
       <StatusBar style="auto" />
