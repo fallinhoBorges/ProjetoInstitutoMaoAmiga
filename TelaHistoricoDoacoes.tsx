@@ -21,6 +21,22 @@ export default function TelaHistoricoDoacoes({ navigation }: Props) {
   const [doacoes, setDoacoes] = useState<Doacao[]>([]);
   const [busca, setBusca] = useState('');
 
+  const resumo = useMemo(() => {
+    const porTipo = new Map<string, { nome: string; quantidade: number; doacoes: number }>();
+    for (const doacao of doacoes) {
+      const chave = doacao.tipoItem.trim().toLowerCase();
+      const atual = porTipo.get(chave) ?? {
+        nome: doacao.tipoItem.trim(),
+        quantidade: 0,
+        doacoes: 0,
+      };
+      atual.quantidade += doacao.quantidade;
+      atual.doacoes += 1;
+      porTipo.set(chave, atual);
+    }
+    return [...porTipo.values()].sort((a, b) => b.quantidade - a.quantidade);
+  }, [doacoes]);
+
   const doacoesFiltradas = useMemo(() => {
     const termo = busca.trim().toLowerCase();
     return doacoes.filter((doacao) => doacao.tipoItem.toLowerCase().includes(termo));
@@ -55,6 +71,24 @@ export default function TelaHistoricoDoacoes({ navigation }: Props) {
           keyExtractor={(doacao) => doacao.id}
           renderItem={({ item }) => <DoacaoItem doacao={item} onPress={abrirDoacao} />}
           keyboardShouldPersistTaps="handled"
+          ListHeaderComponent={
+            <View style={styles.resumo}>
+              <Text style={styles.resumoTitulo}>Resumo</Text>
+              {doacoes.length === 0 ? (
+                <Text style={styles.resumoLinha}>Nenhuma doação para resumir.</Text>
+              ) : (
+                <>
+                  <Text style={styles.resumoLinha}>Total de doações: {doacoes.length}</Text>
+                  {resumo.map((tipo) => (
+                    <Text key={tipo.nome.toLowerCase()} style={styles.resumoLinha}>
+                      {tipo.nome}: {tipo.quantidade} {tipo.quantidade === 1 ? 'unidade' : 'unidades'}{' '}
+                      em {tipo.doacoes} {tipo.doacoes === 1 ? 'doação' : 'doações'}
+                    </Text>
+                  ))}
+                </>
+              )}
+            </View>
+          }
           ListEmptyComponent={
             doacoes.length === 0 ? (
               <View style={styles.vazio}>
@@ -86,6 +120,23 @@ const styles = StyleSheet.create({
   },
   flex: {
     flex: 1,
+  },
+  resumo: {
+    backgroundColor: '#F2F6FA',
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 12,
+  },
+  resumoTitulo: {
+    fontSize: 15,
+    fontWeight: 'bold',
+    color: '#1B3A5C',
+    marginBottom: 4,
+  },
+  resumoLinha: {
+    fontSize: 14,
+    color: '#424242',
+    marginTop: 2,
   },
   busca: {
     borderWidth: 1,
