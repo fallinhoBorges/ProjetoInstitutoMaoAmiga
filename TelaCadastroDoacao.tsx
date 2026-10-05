@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { salvarDoacao } from './doacoesStorage';
+import { atualizarDoacao, salvarDoacao } from './doacoesStorage';
 import { Ponto } from './pontos';
 import { RootStackParamList } from './navigation';
 
@@ -19,10 +19,15 @@ type Props = NativeStackScreenProps<RootStackParamList, 'CadastroDoacao'> & {
   pontos: Ponto[];
 };
 
-export default function TelaCadastroDoacao({ pontos }: Props) {
-  const [tipoItem, setTipoItem] = useState('');
-  const [quantidade, setQuantidade] = useState('');
-  const [pontoDestinoId, setPontoDestinoId] = useState<string | null>(null);
+export default function TelaCadastroDoacao({ pontos, route, navigation }: Props) {
+  const doacaoEditada = route.params?.doacao;
+  const [tipoItem, setTipoItem] = useState(doacaoEditada?.tipoItem ?? '');
+  const [quantidade, setQuantidade] = useState(
+    doacaoEditada ? String(doacaoEditada.quantidade) : ''
+  );
+  const [pontoDestinoId, setPontoDestinoId] = useState<string | null>(
+    pontos.find((ponto) => ponto.nome === doacaoEditada?.pontoDestino)?.id ?? null
+  );
   const [erro, setErro] = useState('');
   const [sucesso, setSucesso] = useState(false);
 
@@ -51,11 +56,19 @@ export default function TelaCadastroDoacao({ pontos }: Props) {
       return;
     }
     const pontoDestino = pontos.find((ponto) => ponto.id === pontoDestinoId)?.nome ?? '';
-    await salvarDoacao({
+    const dados = {
       tipoItem: tipoItem.trim(),
       quantidade: Number(quantidade.trim()),
       pontoDestino,
-    });
+    };
+    if (doacaoEditada) {
+      const atualizada = { ...doacaoEditada, ...dados };
+      await atualizarDoacao(atualizada);
+      Keyboard.dismiss();
+      navigation.popTo('DetalheDoacao', { doacao: atualizada });
+      return;
+    }
+    await salvarDoacao(dados);
     setTipoItem('');
     setQuantidade('');
     setPontoDestinoId(null);
@@ -70,7 +83,7 @@ export default function TelaCadastroDoacao({ pontos }: Props) {
         style={styles.container}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
-      <Text style={styles.titulo}>Registrar doação</Text>
+      <Text style={styles.titulo}>{doacaoEditada ? 'Editar doação' : 'Registrar doação'}</Text>
 
       <Text style={styles.rotulo}>Tipo do item</Text>
       <TextInput
@@ -126,8 +139,15 @@ export default function TelaCadastroDoacao({ pontos }: Props) {
       )}
 
       <TouchableOpacity style={styles.botao} onPress={validar}>
-        <Text style={styles.botaoTexto}>Registrar doação</Text>
+        <Text style={styles.botaoTexto}>
+          {doacaoEditada ? 'Salvar alterações' : 'Registrar doação'}
+        </Text>
       </TouchableOpacity>
+      {doacaoEditada && (
+        <TouchableOpacity style={styles.botaoCancelar} onPress={() => navigation.goBack()}>
+          <Text style={styles.botaoCancelarTexto}>Cancelar</Text>
+        </TouchableOpacity>
+      )}
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
@@ -196,6 +216,19 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: 16,
+  },
+  botaoCancelar: {
+    borderWidth: 1,
+    borderColor: '#1B3A5C',
+    borderRadius: 8,
+    minHeight: 44,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 8,
+  },
+  botaoCancelarTexto: {
+    color: '#1B3A5C',
+    fontWeight: 'bold',
   },
   botaoTexto: {
     color: '#FFFFFF',

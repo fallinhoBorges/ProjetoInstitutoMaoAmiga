@@ -38,6 +38,13 @@ export default function TelaDetalheDoacao({ route, navigation }: Props) {
       <Text style={styles.rotulo}>Registrada em</Text>
       <Text style={styles.valor}>{formatarData(doacao.criadoEm)}</Text>
 
+      <TouchableOpacity
+        style={styles.botaoEditar}
+        onPress={() => navigation.navigate('CadastroDoacao', { doacao })}
+      >
+        <Text style={styles.botaoEditarTexto}>Editar doação</Text>
+      </TouchableOpacity>
+
       <TouchableOpacity style={styles.botaoExcluir} onPress={confirmarExclusao}>
         <Text style={styles.botaoExcluirTexto}>Excluir doação</Text>
       </TouchableOpacity>
@@ -61,6 +68,18 @@ const styles = StyleSheet.create({
     color: '#1B3A5C',
     marginTop: 2,
   },
+  botaoEditar: {
+    backgroundColor: '#1B3A5C',
+    borderRadius: 8,
+    minHeight: 44,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 24,
+  },
+  botaoEditarTexto: {
+    color: '#FFFFFF',
+    fontWeight: 'bold',
+  },
   botaoExcluir: {
     borderWidth: 1,
     borderColor: '#C62828',
@@ -68,7 +87,7 @@ const styles = StyleSheet.create({
     minHeight: 44,
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 24,
+    marginTop: 12,
   },
   botaoExcluirTexto: {
     color: '#C62828',

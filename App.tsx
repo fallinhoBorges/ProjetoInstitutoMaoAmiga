@@ -30,7 +30,12 @@ export default function App() {
         <Stack.Screen name="DetalhePonto" options={{ title: 'Detalhe do Ponto' }}>
           {(props) => <TelaDetalhePonto {...props} pontos={pontos} />}
         </Stack.Screen>
-        <Stack.Screen name="CadastroDoacao" options={{ title: 'Registrar Doação' }}>
+        <Stack.Screen
+          name="CadastroDoacao"
+          options={({ route }) => ({
+            title: route.params?.doacao ? 'Editar Doação' : 'Registrar Doação',
+          })}
+        >
           {(props) => <TelaCadastroDoacao {...props} pontos={pontos} />}
         </Stack.Screen>
         <Stack.Screen

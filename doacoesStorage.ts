@@ -45,3 +45,10 @@ export async function excluirDoacao(id: string): Promise<void> {
   const doacoes = await listarDoacoes();
   await gravarDoacoes(doacoes.filter((doacao) => doacao.id !== id));
 }
+
+export async function atualizarDoacao(atualizada: Doacao): Promise<void> {
+  const doacoes = await listarDoacoes();
+  await gravarDoacoes(
+    doacoes.map((doacao) => (doacao.id === atualizada.id ? atualizada : doacao))
+  );
+}
