@@ -3,6 +3,7 @@ import {
   Keyboard,
   KeyboardAvoidingView,
   Platform,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -83,6 +84,7 @@ export default function TelaCadastroDoacao({ pontos, route, navigation }: Props)
         style={styles.container}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
+      <ScrollView keyboardShouldPersistTaps="handled">
       <Text style={styles.titulo}>{doacaoEditada ? 'Editar doação' : 'Registrar doação'}</Text>
 
       <Text style={styles.rotulo}>Tipo do item</Text>
@@ -148,6 +150,7 @@ export default function TelaCadastroDoacao({ pontos, route, navigation }: Props)
           <Text style={styles.botaoCancelarTexto}>Cancelar</Text>
         </TouchableOpacity>
       )}
+      </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
