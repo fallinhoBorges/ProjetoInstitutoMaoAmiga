@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import {
   Keyboard,
   KeyboardAvoidingView,
   Platform,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -11,7 +12,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { atualizarDoacao, salvarDoacao } from './doacoesStorage';
 import { Ponto } from './pontos';
 import { RootStackParamList } from './navigation';
 
@@ -19,32 +20,17 @@ type Props = NativeStackScreenProps<RootStackParamList, 'CadastroDoacao'> & {
   pontos: Ponto[];
 };
 
-const CHAVE_ULTIMA_DOACAO = '@instituto_mao_amiga:ultima_doacao';
-
-type DoacaoSalva = {
-  tipoItem: string;
-  quantidade: string;
-  pontoDestinoId: string | null;
-};
-
-export default function TelaCadastroDoacao({ pontos }: Props) {
-  const [tipoItem, setTipoItem] = useState('');
-  const [quantidade, setQuantidade] = useState('');
-  const [pontoDestinoId, setPontoDestinoId] = useState<string | null>(null);
+export default function TelaCadastroDoacao({ pontos, route, navigation }: Props) {
+  const doacaoEditada = route.params?.doacao;
+  const [tipoItem, setTipoItem] = useState(doacaoEditada?.tipoItem ?? '');
+  const [quantidade, setQuantidade] = useState(
+    doacaoEditada ? String(doacaoEditada.quantidade) : ''
+  );
+  const [pontoDestinoId, setPontoDestinoId] = useState<string | null>(
+    pontos.find((ponto) => ponto.nome === doacaoEditada?.pontoDestino)?.id ?? null
+  );
   const [erro, setErro] = useState('');
   const [sucesso, setSucesso] = useState(false);
-
-  useEffect(() => {
-    async function carregarUltimaDoacao() {
-      const salvo = await AsyncStorage.getItem(CHAVE_ULTIMA_DOACAO);
-      if (!salvo) return;
-      const doacao: DoacaoSalva = JSON.parse(salvo);
-      setTipoItem(doacao.tipoItem);
-      setQuantidade(doacao.quantidade);
-      setPontoDestinoId(doacao.pontoDestinoId);
-    }
-    carregarUltimaDoacao();
-  }, []);
 
   function handleQuantidadeChange(texto: string) {
     if (texto === '' || /^\d+$/.test(texto)) {
@@ -70,8 +56,23 @@ export default function TelaCadastroDoacao({ pontos }: Props) {
       setErro('Selecione um ponto de destino.');
       return;
     }
-    const doacao: DoacaoSalva = { tipoItem, quantidade, pontoDestinoId };
-    await AsyncStorage.setItem(CHAVE_ULTIMA_DOACAO, JSON.stringify(doacao));
+    const pontoDestino = pontos.find((ponto) => ponto.id === pontoDestinoId)?.nome ?? '';
+    const dados = {
+      tipoItem: tipoItem.trim(),
+      quantidade: Number(quantidade.trim()),
+      pontoDestino,
+    };
+    if (doacaoEditada) {
+      const atualizada = { ...doacaoEditada, ...dados };
+      await atualizarDoacao(atualizada);
+      Keyboard.dismiss();
+      navigation.popTo('DetalheDoacao', { doacao: atualizada });
+      return;
+    }
+    await salvarDoacao(dados);
+    setTipoItem('');
+    setQuantidade('');
+    setPontoDestinoId(null);
     setErro('');
     setSucesso(true);
     Keyboard.dismiss();
@@ -83,7 +84,8 @@ export default function TelaCadastroDoacao({ pontos }: Props) {
         style={styles.container}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
-      <Text style={styles.titulo}>Registrar doação</Text>
+      <ScrollView keyboardShouldPersistTaps="handled">
+      <Text style={styles.titulo}>{doacaoEditada ? 'Editar doação' : 'Registrar doação'}</Text>
 
       <Text style={styles.rotulo}>Tipo do item</Text>
       <TextInput
@@ -139,8 +141,16 @@ export default function TelaCadastroDoacao({ pontos }: Props) {
       )}
 
       <TouchableOpacity style={styles.botao} onPress={validar}>
-        <Text style={styles.botaoTexto}>Registrar doação</Text>
+        <Text style={styles.botaoTexto}>
+          {doacaoEditada ? 'Salvar alterações' : 'Registrar doação'}
+        </Text>
       </TouchableOpacity>
+      {doacaoEditada && (
+        <TouchableOpacity style={styles.botaoCancelar} onPress={() => navigation.goBack()}>
+          <Text style={styles.botaoCancelarTexto}>Cancelar</Text>
+        </TouchableOpacity>
+      )}
+      </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
@@ -209,6 +219,19 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: 16,
+  },
+  botaoCancelar: {
+    borderWidth: 1,
+    borderColor: '#1B3A5C',
+    borderRadius: 8,
+    minHeight: 44,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 8,
+  },
+  botaoCancelarTexto: {
+    color: '#1B3A5C',
+    fontWeight: 'bold',
   },
   botaoTexto: {
     color: '#FFFFFF',

@@ -92,6 +92,13 @@ export default function TelaListaPontos({ navigation, pontos, onAdicionarPonto }
           <Text style={styles.botaoSecundarioTexto}>Registrar doação</Text>
         </TouchableOpacity>
 
+        <TouchableOpacity
+          style={styles.botaoSecundario}
+          onPress={() => navigation.navigate('HistoricoDoacoes')}
+        >
+          <Text style={styles.botaoSecundarioTexto}>Minhas doações</Text>
+        </TouchableOpacity>
+
         <TextInput
           style={styles.busca}
           placeholder="Buscar pontos..."
