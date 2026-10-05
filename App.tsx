@@ -5,6 +5,7 @@ import { useState } from 'react';
 import TelaListaPontos from './TelaListaPontos';
 import TelaDetalhePonto from './TelaDetalhePonto';
 import TelaCadastroDoacao from './TelaCadastroDoacao';
+import TelaHistoricoDoacoes from './TelaHistoricoDoacoes';
 import { RootStackParamList } from './navigation';
 import { Ponto, pontosIniciais } from './pontos';
 
@@ -31,6 +32,11 @@ export default function App() {
         <Stack.Screen name="CadastroDoacao" options={{ title: 'Registrar Doação' }}>
           {(props) => <TelaCadastroDoacao {...props} pontos={pontos} />}
         </Stack.Screen>
+        <Stack.Screen
+          name="HistoricoDoacoes"
+          component={TelaHistoricoDoacoes}
+          options={{ title: 'Minhas doações' }}
+        />
       </Stack.Navigator>
       <StatusBar style="auto" />
     </NavigationContainer>
